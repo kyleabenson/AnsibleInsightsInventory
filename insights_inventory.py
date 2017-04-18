@@ -11,7 +11,7 @@ class InsightsInventory(object):
     def _empty_inventory(self):
         return {}
     def read_settings(self):
-        """ Reads the settings from the cobbler.ini file """
+        """ Reads the settings from the insights_inventory.ini file """
 
         config = ConfigParser.SafeConfigParser()
         config.read(os.path.dirname(os.path.realpath(__file__)) + '/insights_inventory.ini')
@@ -29,9 +29,9 @@ class InsightsInventory(object):
     def parse_cli_args(self):
         ''' Command line argument processing '''
 
-        parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on EC2')
+        parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on Red Hat Insights')
         parser.add_argument('--list', action='store_true', default=True,
-                           help='List instances (default: True)')
+                           help='List systems in all groups (default: True)')
         parser.add_argument('--host', action='store',
                            help='Get all the variables about a specific instance')
 
@@ -47,17 +47,17 @@ class InsightsInventory(object):
     def _get_group_systems(self, inventory):
         for key, value in self.inventory.items():
             group_id = value['group_id']
-            self.insights_system_url = self.insights_system_url.replace("GROUP_ID", str(group_id))
-            self.s = requests.get(self.insights_system_url, auth=(self.username, self.password))
+            insights_system_url = self.insights_system_url.replace("GROUP_ID", str(group_id))
+            self.s = requests.get(insights_system_url, auth=(self.username, self.password))
             system_data = json.loads(self.s.content)
             ## Need some sort of error handling here..
 
             if len(system_data["systems"]) < 1:
                 pass
             for i in list(system_data['systems']):
-                self.inventory[key]['hosts'].append(i['display_name'])
+                value['hosts'].append(i['toString'])
 
-            return self.inventory
+        return self.inventory
 
     def __init__(self):
         ''' Main execution path '''
