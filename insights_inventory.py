@@ -37,7 +37,7 @@ class InsightsInventory(object):
 
         self.args = parser.parse_args()
     def _get_groups(self, inventory):
-        self.r = requests.get(self.insights_group_url, auth=(self.username, self.password))
+        self.r = requests.get(self.insights_group_url, auth=(self.username, self.password), verify=False)
         data = json.loads(self.r.content)
 
         for i in data:
@@ -48,7 +48,7 @@ class InsightsInventory(object):
         for key, value in self.inventory.items():
             group_id = value['group_id']
             insights_system_url = self.insights_system_url.replace("GROUP_ID", str(group_id))
-            self.s = requests.get(insights_system_url, auth=(self.username, self.password))
+            self.s = requests.get(insights_system_url, auth=(self.username, self.password), verify=False)
             system_data = json.loads(self.s.content)
             ## Need some sort of error handling here..
 
